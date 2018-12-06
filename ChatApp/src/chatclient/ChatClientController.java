@@ -27,7 +27,6 @@ public class ChatClientController implements Initializable {
     //IO streams
     DataOutputStream toServer = null;
     DataInputStream fromServer = null;
-    Socket socket;
     
     @FXML private TextField userInput;
     @FXML private TextArea showMsg;
@@ -43,11 +42,7 @@ public class ChatClientController implements Initializable {
                 
                 //write on the output streams
                 toServer.writeUTF(sendMsg); 
-//              userInput.setText("");
 
-                //read the message sent to this client
-               /* String receiveMsg = fromServer.readUTF();
-                showMsg.appendText(receiveMsg + "\n");*/
                 userInput.setText("");
                 
             }catch(IOException ex) {
@@ -59,38 +54,34 @@ public class ChatClientController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO     
-        
-        /*try {
-            Socket socket = new Socket("127.0.0.1", 3371);
-            
-            //obtaining input and output streams
-            fromServer = new DataInputStream(socket.getInputStream());
-            toServer = new DataOutputStream(socket.getOutputStream());         
-            
-        } catch (IOException ex) {
-            showMsg.appendText("Could not connect to server!");
-        }*/
-            new ClientThread().start();
-            showMsg.setText("connected\n");
-    }
+        new ClientThread().start();
+    }    
     
-    private class ClientThread extends Thread {
+    
+    class ClientThread extends Thread {
  
         @Override
         public void run() {
             try {
-                socket = new Socket("127.0.0.1", 3371);
-                fromServer = new DataInputStream(socket.getInputStream());
-            toServer = new DataOutputStream(socket.getOutputStream());
- 
-                while (true) {
-                    showMsg.appendText(fromServer.readUTF() + "\n");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            Socket socket = new Socket("127.0.0.1", 3371);
+            
+            //obtaining input and output streams
+            fromServer = new DataInputStream(socket.getInputStream());
+            toServer = new DataOutputStream(socket.getOutputStream()); 
+            
+            while (true) {
+                showMsg.appendText("Friend: " + fromServer.readUTF() + "\n");
             }
+            
+            } catch (IOException ex) {
+                showMsg.appendText("Could not connect to server!");
+            } 
         }
  
-    }
+    }    
     
-}
+}  
+    
+    
+    
+

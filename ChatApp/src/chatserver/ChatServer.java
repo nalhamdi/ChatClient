@@ -11,26 +11,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Date;
-import javafx.application.Application;
-import static javafx.application.Application.launch;
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
 /**
  *
  * @author cyoun
  */
-
-
-
 
 public class ChatServer {   
     
@@ -128,8 +113,7 @@ class HandleAClient implements Runnable {
                 */                
                 
                 for(HandleAClient client : ChatServer.clients){
-                    client.outputToClient.writeUTF(this.name + ": " 
-                                                             + receivedMsg);
+                    client.outputToClient.writeUTF(receivedMsg);
                 }                
             } catch (IOException ex){
                 System.out.println("Could not create data "
