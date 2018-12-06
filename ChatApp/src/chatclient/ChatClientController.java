@@ -27,6 +27,7 @@ public class ChatClientController implements Initializable {
     //IO streams
     DataOutputStream toServer = null;
     DataInputStream fromServer = null;
+    Socket socket;
     
     @FXML private TextField userInput;
     @FXML private TextArea showMsg;
@@ -45,8 +46,8 @@ public class ChatClientController implements Initializable {
 //              userInput.setText("");
 
                 //read the message sent to this client
-                String receiveMsg = fromServer.readUTF();
-                showMsg.appendText(receiveMsg + "\n");
+               /* String receiveMsg = fromServer.readUTF();
+                showMsg.appendText(receiveMsg + "\n");*/
                 userInput.setText("");
                 
             }catch(IOException ex) {
@@ -59,7 +60,7 @@ public class ChatClientController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO     
         
-        try {
+        /*try {
             Socket socket = new Socket("127.0.0.1", 3371);
             
             //obtaining input and output streams
@@ -68,8 +69,28 @@ public class ChatClientController implements Initializable {
             
         } catch (IOException ex) {
             showMsg.appendText("Could not connect to server!");
+        }*/
+            new ClientThread().start();
+            showMsg.setText("connected\n");
+    }
+    
+    private class ClientThread extends Thread {
+ 
+        @Override
+        public void run() {
+            try {
+                socket = new Socket("127.0.0.1", 3371);
+                fromServer = new DataInputStream(socket.getInputStream());
+            toServer = new DataOutputStream(socket.getOutputStream());
+ 
+                while (true) {
+                    showMsg.appendText(fromServer.readUTF() + "\n");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-            
-    }   
+ 
+    }
     
 }
