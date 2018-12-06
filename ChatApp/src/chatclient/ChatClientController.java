@@ -33,8 +33,32 @@ public class ChatClientController implements Initializable {
     @FXML private Button sendButton;
         
     @FXML
-    private void handleButtonAction(ActionEvent event) {
-        //initialize connection to server
+    private void handleButtonAction(ActionEvent event) {        
+        
+        new Thread ( () -> {
+            
+            try {    
+                String sendMsg = userInput.getText();
+                
+                //write on the output streams
+                toServer.writeUTF(sendMsg); 
+//              userInput.setText("");
+
+                //read the message sent to this client
+                String receiveMsg = fromServer.readUTF();
+                showMsg.appendText(receiveMsg + "\n");
+                userInput.setText("");
+                
+            }catch(IOException ex) {
+                System.out.println("Could not send/recieve messages");
+            }
+        }).start();    
+    }
+    
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        // TODO     
+        
         try {
             Socket socket = new Socket("127.0.0.1", 3371);
             
@@ -45,55 +69,6 @@ public class ChatClientController implements Initializable {
         } catch (IOException ex) {
             showMsg.appendText("Could not connect to server!");
         }
-        
-        //sendMessage thread
-        Thread sendMessage = new Thread (new Runnable(){
-            
-            @Override
-            public void run() {
-                while(true) {
-                    
-                    //read the message 
-                    String msg = userInput.getText();
-                    
-                    try {
-                        //write on the output streams
-                        toServer.writeUTF(msg); 
-//                        userInput.setText("");
-                    } catch (IOException ex) {
-                        showMsg.appendText("Could not send messages");
-                    }
-                }
-            }
-            
-        });
-        
-        //readMessage thread
-        Thread readMessage = new Thread(new Runnable() {
-            
-            @Override
-            public void run() {
-                while (true) {
-                    try{
-                        //read the message sent to this client
-                        String msg = fromServer.readUTF();
-                        showMsg.appendText(msg + "\n");
-                        userInput.setText("");
-                        
-                    } catch(IOException ex) {
-                        System.out.println("Could not receive messages");
-                    }
-                }
-            }
-        });
-        
-        sendMessage.start();
-        readMessage.start();
-    }
-    
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO       
             
     }   
     
