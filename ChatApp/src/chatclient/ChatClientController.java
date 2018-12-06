@@ -5,7 +5,6 @@
  */
 package chatclient;
 
-import chatserver.ChatServer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -38,25 +37,58 @@ public class ChatClientController implements Initializable {
         //initialize connection to server
         try {
             Socket socket = new Socket("127.0.0.1", 3371);
+            
+            //obtaining input and output streams
             fromServer = new DataInputStream(socket.getInputStream());
-            toServer = new DataOutputStream(socket.getOutputStream());
+            toServer = new DataOutputStream(socket.getOutputStream());         
             
         } catch (IOException ex) {
             showMsg.appendText("Could not connect to server!");
         }
         
-        //send and receive messages from clients
-        try {
-            toServer.writeUTF(userInput.getText());
-            toServer.flush();
+        //sendMessage thread
+        Thread sendMessage = new Thread (new Runnable(){
             
-            String receiveMessage = fromServer.readUTF();
-            showMsg.appendText(receiveMessage);
+            @Override
+            public void run() {
+                while(true) {
+                    
+                    //read the message 
+                    String msg = userInput.getText();
+                    
+                    try {
+                        //write on the output streams
+                        toServer.writeUTF(msg); 
+//                        userInput.setText("");
+                    } catch (IOException ex) {
+                        showMsg.appendText("Could not send messages");
+                    }
+                }
+            }
             
-        } catch (IOException ex) {
-            showMsg.appendText("Could not send/receive messages");
-        }
+        });
         
+        //readMessage thread
+        Thread readMessage = new Thread(new Runnable() {
+            
+            @Override
+            public void run() {
+                while (true) {
+                    try{
+                        //read the message sent to this client
+                        String msg = fromServer.readUTF();
+                        showMsg.appendText(msg + "\n");
+                        userInput.setText("");
+                        
+                    } catch(IOException ex) {
+                        System.out.println("Could not receive messages");
+                    }
+                }
+            }
+        });
+        
+        sendMessage.start();
+        readMessage.start();
     }
     
     @Override

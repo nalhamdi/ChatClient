@@ -14,6 +14,7 @@ import java.net.Socket;
 import javafx.scene.control.TextField;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -27,17 +28,42 @@ import javafx.scene.control.TextArea;
  */
 public class ChatServerController implements Initializable {
     
-    private final int PORT = 3371;   
+    private final int PORT = 3371; 
+    
+    //IO streams
+    DataOutputStream toServer = null;
+    DataInputStream fromServer = null;
     
     //list to hold multiple client
     private ArrayList<HandleAClient> clients = new ArrayList<>();    
-    private int amountOfClient = 0;
+    private int amountOfClient = 1;
     
     @FXML private TextArea showMsg; 
+    @FXML private TextField userInput;
     
     @FXML
     private void handleButtonAction(ActionEvent event) {
-              
+        
+        try {
+            Socket socket = new Socket("127.0.0.1", 3371);
+            fromServer = new DataInputStream(socket.getInputStream());
+            toServer = new DataOutputStream(socket.getOutputStream());
+            
+        } catch (IOException ex) {
+            showMsg.appendText("Could not connect to server!");
+        }
+        
+        try {
+            toServer.writeUTF(userInput.getText());
+            toServer.flush();
+            
+            String receiveMessage = fromServer.readUTF();
+            showMsg.appendText(receiveMessage + "\n");
+            userInput.setText("");
+            
+        } catch (IOException ex) {
+            showMsg.appendText("Could not send/receive messages");
+        }
     }
     
     @Override
@@ -50,18 +76,19 @@ public class ChatServerController implements Initializable {
 
                 ServerSocket serverSocket = new ServerSocket(PORT);
                 showMsg.appendText("Server started at " + new Date() + '\n');
-                System.out.println(serverSocket.getInetAddress().toString());
+             // System.out.println(serverSocket.getInetAddress().toString());
 
                 while (true)
                 {
                     Socket socket = serverSocket.accept();
                     System.out.println("Worked \n");
-                    showMsg.appendText("Worked \n");
+                    showMsg.appendText("Connect with client " + 
+                                       amountOfClient + "\n");
 
                     //increase amountOfClient forEach new connection 
                     amountOfClient++;
-
-                    new Thread(new HandleAClient(socket)).start();
+                    
+//                   new Thread(new HandleAClient(socket)).start();
                 }
 
             } catch (IOException ex) {
@@ -71,7 +98,7 @@ public class ChatServerController implements Initializable {
     }
     
     //create individual client socket
-    class HandleAClient implements Runnable {
+    /* class HandleAClient implements Runnable {
 
         private Socket socket;
         DataInputStream inputFromClient;
@@ -93,6 +120,8 @@ public class ChatServerController implements Initializable {
                     
                     String receiveMsg = inputFromClient.readUTF();
                     
+//            clients = Collections.synchronizedList(new HandleAClient(socket));
+                    
                     //clients object contains null since it's not been updated
                     for(int i = 0; i < clients.size(); i++)
                         clients.get(i).outputToClient.writeUTF(receiveMsg);
@@ -107,5 +136,5 @@ public class ChatServerController implements Initializable {
             }
             
         }    
-    }  
+    }  */
 }
