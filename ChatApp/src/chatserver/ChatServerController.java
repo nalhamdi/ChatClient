@@ -50,10 +50,12 @@ public class ChatServerController implements Initializable {
 
                 ServerSocket serverSocket = new ServerSocket(PORT);
                 showMsg.appendText("Server started at " + new Date() + '\n');
+                System.out.println(serverSocket.getInetAddress().toString());
 
                 while (true)
                 {
                     Socket socket = serverSocket.accept();
+                    System.out.println("Worked \n");
                     showMsg.appendText("Worked \n");
 
                     //increase amountOfClient forEach new connection 
@@ -90,6 +92,10 @@ public class ChatServerController implements Initializable {
                 while(true) {
                     
                     String receiveMsg = inputFromClient.readUTF();
+                    
+                    //clients object contains null since it's not been updated
+                    for(int i = 0; i < clients.size(); i++)
+                        clients.get(i).outputToClient.writeUTF(receiveMsg);
                     
                     outputToClient.writeUTF(receiveMsg);
                     showMsg.appendText(receiveMsg + "\n");                  

@@ -37,7 +37,7 @@ public class ChatClientController implements Initializable {
     private void handleButtonAction(ActionEvent event) {
         //initialize connection to server
         try {
-            Socket socket = new Socket("HOST", 3371);
+            Socket socket = new Socket("127.0.0.1", 3371);
             fromServer = new DataInputStream(socket.getInputStream());
             toServer = new DataOutputStream(socket.getOutputStream());
             
