@@ -80,8 +80,9 @@ public class ChatClientController implements Initializable {
             toServer = new DataOutputStream(socket.getOutputStream()); 
             
             while (true) {
-                showMsg.appendText(determineString(fromServer.readUTF()) + "\n");
-                System.out.println(socket.getLocalPort());
+                String message = fromServer.readUTF();
+                showMsg.appendText(determineString(message) + "\n");;
+                System.out.println(message);
             }
             
             } catch (IOException ex) {
@@ -93,6 +94,7 @@ public class ChatClientController implements Initializable {
             String message = "";
             String [] sentStr = str.split(":");
             String tokenizer = sentStr[0];
+           
             
             if(token.equals(tokenizer)){
                 message = str.replace(tokenizer, "You");

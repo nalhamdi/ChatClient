@@ -116,6 +116,7 @@ class HandleAClient implements Runnable {
                 
                 for(HandleAClient client : ChatServer.clients){
                     client.outputToClient.writeUTF(socket.getPort()+": " + receivedMsg);
+                    System.out.println(socket.getPort()+": " + receivedMsg);
                 }                
             } catch (IOException ex){
                 System.out.println("Could not create data "
