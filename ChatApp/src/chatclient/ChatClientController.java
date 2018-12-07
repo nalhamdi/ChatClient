@@ -27,6 +27,10 @@ public class ChatClientController implements Initializable {
     //IO streams
     DataOutputStream toServer = null;
     DataInputStream fromServer = null;
+    String token;
+    
+    private int id;
+    private static int clientNum = 0;
     
     @FXML private TextField userInput;
     @FXML private TextArea showMsg;
@@ -55,27 +59,47 @@ public class ChatClientController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO     
         new ClientThread().start();
+        id = clientNum;
+        clientNum++;
     }    
     
     
     class ClientThread extends Thread {
+        
  
         @Override
         public void run() {
             try {
             Socket socket = new Socket("127.0.0.1", 3371);
             
+            token  = Integer.toString(socket.getLocalPort());
+            System.out.println(socket.getLocalPort());
+            
             //obtaining input and output streams
             fromServer = new DataInputStream(socket.getInputStream());
             toServer = new DataOutputStream(socket.getOutputStream()); 
             
             while (true) {
-                showMsg.appendText("Friend: " + fromServer.readUTF() + "\n");
+                showMsg.appendText(determineString(fromServer.readUTF()) + "\n");
+                System.out.println(socket.getLocalPort());
             }
             
             } catch (IOException ex) {
                 showMsg.appendText("Could not connect to server!");
             } 
+        }
+        
+        private String determineString(String str){
+            String message = "";
+            String [] sentStr = str.split(":");
+            String tokenizer = sentStr[0];
+            
+            if(token.equals(tokenizer)){
+                message = str.replace(tokenizer, "You");
+            }else{
+                message = str.replace(tokenizer, "Friend");
+            }
+            return message;
         }
  
     }    

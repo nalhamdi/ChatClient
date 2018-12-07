@@ -39,6 +39,8 @@ public class ChatServer {
             socket = serverSocket.accept();
             
             System.out.println("New client request was received: " + socket);
+            System.out.println("client" + clientNo + " address: " + 
+                                    socket.getPort());
             
             //obtain input and output streams
             DataInputStream fromServer = new DataInputStream
@@ -113,7 +115,7 @@ class HandleAClient implements Runnable {
                 */                
                 
                 for(HandleAClient client : ChatServer.clients){
-                    client.outputToClient.writeUTF(receivedMsg);
+                    client.outputToClient.writeUTF(socket.getPort()+": " + receivedMsg);
                 }                
             } catch (IOException ex){
                 System.out.println("Could not create data "
