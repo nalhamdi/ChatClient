@@ -30,7 +30,9 @@ public class ChatClientController implements Initializable {
     String token;
     
     private int id;
-    private static int clientNum = 0;
+    private static int clientNum = 1;
+    
+    private String consoleMsg;
     
     @FXML private TextField userInput;
     @FXML private TextArea showMsg;
@@ -59,8 +61,8 @@ public class ChatClientController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO     
         new ClientThread().start();
-        id = clientNum;
-        clientNum++;
+        id = clientNum - 1;
+        clientNum = clientNum+1;
     }    
     
     
@@ -82,7 +84,7 @@ public class ChatClientController implements Initializable {
             while (true) {
                 String message = fromServer.readUTF();
                 showMsg.appendText(determineString(message) + "\n");;
-                System.out.println(message);
+                System.out.println(consoleMsg);
             }
             
             } catch (IOException ex) {
@@ -94,7 +96,8 @@ public class ChatClientController implements Initializable {
             String message = "";
             String [] sentStr = str.split(":");
             String tokenizer = sentStr[0];
-           
+            
+            consoleMsg = "client "+id+sentStr[1];
             
             if(token.equals(tokenizer)){
                 message = str.replace(tokenizer, "You");
