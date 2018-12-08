@@ -39,8 +39,7 @@ public class ChatServer {
             socket = serverSocket.accept();
             
             System.out.println("New client request was received: " + socket);
-            System.out.println("client" + clientNo + " address: " + 
-                                    socket.getPort());
+            System.out.println(socket.getInetAddress().getHostAddress());
             
             //obtain input and output streams
             DataInputStream fromServer = new DataInputStream
@@ -98,26 +97,19 @@ class HandleAClient implements Runnable {
             try{
             
                 //receive the string 
-                receivedMsg = inputFromClient.readUTF();
+                receivedMsg = inputFromClient.readUTF();               
                 
-                System.out.println(receivedMsg);
-
                 if(receivedMsg.equals("bye")){
                     this.socket.close();
                     break;
-                }
-                
-                //break the string into message and recipient part
-                /*
-                    StringTokenizer st = new StringTokenizer(received, "#"); 
-                    String MsgToSend = st.nextToken(); 
-                    String recipient = st.nextToken();
-                */                
+                }                             
                 
                 for(HandleAClient client : ChatServer.clients){
-                    client.outputToClient.writeUTF(socket.getPort()+": " + receivedMsg);
-                    System.out.println(socket.getPort()+": " + receivedMsg);
-                }                
+                    client.outputToClient.writeUTF(socket.getPort() + 
+                                                   ": " + receivedMsg);
+                }                 
+                System.out.println(this.name + ": "  + receivedMsg);
+                
             } catch (IOException ex){
                 System.out.println("Could not create data "
                                     + " stream with client! \n");

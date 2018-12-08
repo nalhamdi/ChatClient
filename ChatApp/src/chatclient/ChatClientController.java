@@ -29,14 +29,9 @@ public class ChatClientController implements Initializable {
     DataInputStream fromServer = null;
     String token;
     
-    private int id;
-    private static int clientNum = 1;
-    
-    private String consoleMsg;
-    
     @FXML private TextField userInput;
     @FXML private TextArea showMsg;
-    @FXML private Button sendButton;
+    @FXML private Button sendButton;   
         
     @FXML
     private void handleButtonAction(ActionEvent event) {        
@@ -61,21 +56,17 @@ public class ChatClientController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO     
         new ClientThread().start();
-        id = clientNum - 1;
-        clientNum = clientNum+1;
     }    
     
     
     class ClientThread extends Thread {
-        
  
         @Override
         public void run() {
             try {
-            Socket socket = new Socket("127.0.0.1", 3371);
+            Socket socket = new Socket("localhost", 3371);
             
             token  = Integer.toString(socket.getLocalPort());
-            System.out.println(socket.getLocalPort());
             
             //obtaining input and output streams
             fromServer = new DataInputStream(socket.getInputStream());
@@ -83,8 +74,8 @@ public class ChatClientController implements Initializable {
             
             while (true) {
                 String message = fromServer.readUTF();
-                showMsg.appendText(determineString(message) + "\n");;
-                System.out.println(consoleMsg);
+                showMsg.appendText(determineString(message) + "\n");
+                System.out.println(determineString(message));
             }
             
             } catch (IOException ex) {
@@ -96,8 +87,6 @@ public class ChatClientController implements Initializable {
             String message = "";
             String [] sentStr = str.split(":");
             String tokenizer = sentStr[0];
-            
-            consoleMsg = "client "+id+sentStr[1];
             
             if(token.equals(tokenizer)){
                 message = str.replace(tokenizer, "You");
